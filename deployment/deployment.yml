@@ -1,0 +1,19 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: nttdatapi
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nttdatapi
+  template:
+    metadata:
+      labels:
+        app: nttdatapi 
+    spec:
+      containers:
+        - name: nttdatapi 
+          image: arcndapi.azurecr.io/nttdatapi
+          ports:
+          - containerPort: 80
