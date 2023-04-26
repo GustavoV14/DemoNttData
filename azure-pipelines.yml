@@ -1,5 +1,5 @@
 trigger:
-- main
+- master
 
 resources:
 - repo: self
@@ -28,13 +28,13 @@ stages:
             packageType: 'sdk'  
             version: '7.x'  
 
-        - task: SonarCloudPrepare@1
-          inputs:
-            SonarCloud: 'SonarCloud'
-            organization: 'testroject'
-            scannerMode: 'MSBuild'
-            projectKey: 'TestProject_NttDataApi'
-            projectName: 'NttDataApi'
+        # - task: SonarCloudPrepare@1
+        #   inputs:
+        #     SonarCloud: 'SonarCloud'
+        #     organization: 'testroject'
+        #     scannerMode: 'MSBuild'
+        #     projectKey: 'TestProject_NttDataApi'
+        #     projectName: 'NttDataApi'
             
         - task: DotNetCoreCLI@2
           displayName: 'Restore NuGet packages'
@@ -47,7 +47,7 @@ stages:
           inputs:
             command: 'build'
             # projects: '**/*.csproj'
-            projects: 'NTTData.Api/NTTData.csproj'
+            projects: '**/*.csproj'
 
         - task: DotNetCoreCLI@2
           displayName: 'Run unit tests'
@@ -61,74 +61,74 @@ stages:
           continueOnError: true
 
 
-        - task: SonarCloudAnalyze@1
-          displayName: 'SonarQube analysis'
+        # - task: SonarCloudAnalyze@1
+        #   displayName: 'SonarQube analysis'
 
-        - task: SonarCloudPublish@1
-          displayName: 'Publish SonarQube analysis'
-          inputs:
-            pollingTimeoutSec: '300'
+        # - task: SonarCloudPublish@1
+        #   displayName: 'Publish SonarQube analysis'
+        #   inputs:
+        #     pollingTimeoutSec: '300'
 
 
-#     - job: BuildDocker
-#       dependsOn: BuildNetcore
-#       pool:
-#        vmImage: ubuntu-latest
-#       steps:
-#       - task: Docker@2
-#         displayName: Build and Push the image
-#         inputs:
-#           containerRegistry: 'ARCNttData'
-#           repository: '$(imageRepo)'
-#           command: 'buildAndPush'
-#           Dockerfile: '$(Build.SourcesDirectory)/NTTData.Api/Dockerfile'
-#           buildContext: '$(Build.SourcesDirectory)/NTTData.Api/'
-#           tags: '$(tag)'
+    - job: BuildDocker
+      dependsOn: BuildNetcore
+      pool:
+       vmImage: ubuntu-latest
+      steps:
+      - task: Docker@2
+        displayName: Build and Push the image
+        inputs:
+          containerRegistry: 'ARCNttData'
+          repository: '$(imageRepo)'
+          command: 'buildAndPush'
+          Dockerfile: '$(Build.SourcesDirectory)/Demo.Api/Dockerfile'
+          buildContext: '$(Build.SourcesDirectory)/Demo.Api/'
+          tags: '$(tag)'
           
          
 
-#       - task: PublishPipelineArtifact@1
-#         inputs:
-#           targetPath: '$(Pipeline.Workspace)/s/deployment'
-#           artifact: 'manifests'
-#           publishLocation: 'pipeline'
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: '$(Pipeline.Workspace)/s/deployment'
+          artifact: 'manifests'
+          publishLocation: 'pipeline'
 
-# - stage: Deploy
-#   displayName: Deploy to Dev
-#   dependsOn: Build
-#   jobs:
-#   - deployment: Deploy
-#     displayName: Deploy to AKS
-#     environment: 'Production' 
-#     pool:
-#       vmImage: ubuntu-latest
-#     strategy:
-#       runOnce:
-#         deploy:
-#           steps:
+- stage: Deploy
+  displayName: Deploy to Dev
+  dependsOn: Build
+  jobs:
+  - deployment: Deploy
+    displayName: Deploy to AKS
+    environment: 'Production' 
+    pool:
+      vmImage: ubuntu-latest
+    strategy:
+      runOnce:
+        deploy:
+          steps:
 
-#             - task: DownloadPipelineArtifact@2
-#               inputs:
-#                 buildType: 'current'
-#                 artifactName: 'manifests'
-#                 targetPath: '$(Pipeline.Workspace)/manifests'
+            - task: DownloadPipelineArtifact@2
+              inputs:
+                buildType: 'current'
+                artifactName: 'manifests'
+                targetPath: '$(Pipeline.Workspace)/manifests'
 
-#             - task: KubernetesManifest@0
-#               inputs:
-#                 action: 'createSecret'
-#                 kubernetesServiceConnection: 'ClusterNttData'
-#                 namespace: 'nttdatadev'
-#                 secretType: 'dockerRegistry'
-#                 secretName: '$(acrsecret)'
-#                 dockerRegistryEndpoint: 'ARCNttData'
+            - task: KubernetesManifest@0
+              inputs:
+                action: 'createSecret'
+                kubernetesServiceConnection: 'ClusterNttData'
+                namespace: 'nttdatadev'
+                secretType: 'dockerRegistry'
+                secretName: '$(acrsecret)'
+                dockerRegistryEndpoint: 'ARCNttData'
 
-#             - task: KubernetesManifest@0
-#               inputs:
-#                 action: 'deploy'
-#                 kubernetesServiceConnection: 'ClusterNttData'
-#                 namespace: 'nttdatadev'
-#                 manifests: |
-#                   $(Pipeline.Workspace)/manifests/deployment.yml
-#                   $(Pipeline.Workspace)/manifests/service.yml
-#                 containers: '$(acrdevurl)/$(imageRepo):$(tag)'
-#                 imagePullSecrets: '$(acrsecret)'
+            - task: KubernetesManifest@0
+              inputs:
+                action: 'deploy'
+                kubernetesServiceConnection: 'ClusterNttData'
+                namespace: 'nttdatadev'
+                manifests: |
+                  $(Pipeline.Workspace)/manifests/deployment.yml
+                  $(Pipeline.Workspace)/manifests/service.yml
+                containers: '$(acrdevurl)/$(imageRepo):$(tag)'
+                imagePullSecrets: '$(acrsecret)'
