@@ -28,13 +28,13 @@ stages:
             packageType: 'sdk'  
             version: '7.x'  
 
-        - task: SonarCloudPrepare@1
-          inputs:
-            SonarCloud: 'SonarCloud'
-            organization: 'testroject'
-            scannerMode: 'MSBuild'
-            projectKey: 'TestProject_NttDataApi'
-            projectName: 'NttDataApi'
+        # - task: SonarCloudPrepare@1
+        #   inputs:
+        #     SonarCloud: 'SonarCloud'
+        #     organization: 'testroject'
+        #     scannerMode: 'MSBuild'
+        #     projectKey: 'TestProject_NttDataApi'
+        #     projectName: 'NttDataApi'
             
         - task: DotNetCoreCLI@2
           displayName: 'Restore NuGet packages'
@@ -61,13 +61,13 @@ stages:
           continueOnError: true
 
 
-        - task: SonarCloudAnalyze@1
-          displayName: 'SonarQube analysis'
+        # - task: SonarCloudAnalyze@1
+        #   displayName: 'SonarQube analysis'
 
-        - task: SonarCloudPublish@1
-          displayName: 'Publish SonarQube analysis'
-          inputs:
-            pollingTimeoutSec: '300'
+        # - task: SonarCloudPublish@1
+        #   displayName: 'Publish SonarQube analysis'
+        #   inputs:
+        #     pollingTimeoutSec: '300'
 
 
 #     - job: BuildDocker
