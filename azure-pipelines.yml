@@ -70,65 +70,65 @@ stages:
         #     pollingTimeoutSec: '300'
 
 
-#     - job: BuildDocker
-#       dependsOn: BuildNetcore
-#       pool:
-#        vmImage: ubuntu-latest
-#       steps:
-#       - task: Docker@2
-#         displayName: Build and Push the image
-#         inputs:
-#           containerRegistry: 'ARCNttData'
-#           repository: '$(imageRepo)'
-#           command: 'buildAndPush'
-#           Dockerfile: '$(Build.SourcesDirectory)/Demo.Api/Dockerfile'
-#           buildContext: '$(Build.SourcesDirectory)/Demo.Api/'
-#           tags: '$(tag)'
+    - job: BuildDocker
+      dependsOn: BuildNetcore
+      pool:
+       vmImage: ubuntu-latest
+      steps:
+      - task: Docker@2
+        displayName: Build and Push the image
+        inputs:
+          containerRegistry: 'ARCNttData'
+          repository: '$(imageRepo)'
+          command: 'buildAndPush'
+          Dockerfile: '$(Build.SourcesDirectory)/Demo.Api/Dockerfile'
+          buildContext: '$(Build.SourcesDirectory)/Demo.Api/'
+          tags: '$(tag)'
           
          
 
-#       - task: PublishPipelineArtifact@1
-#         inputs:
-#           targetPath: '$(Pipeline.Workspace)/s/deployment'
-#           artifact: 'manifests'
-#           publishLocation: 'pipeline'
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: '$(Pipeline.Workspace)/s/deployment'
+          artifact: 'manifests'
+          publishLocation: 'pipeline'
 
-# - stage: Deploy
-#   displayName: Deploy to Dev
-#   dependsOn: Build
-#   jobs:
-#   - deployment: Deploy
-#     displayName: Deploy to AKS
-#     environment: 'Production' 
-#     pool:
-#       vmImage: ubuntu-latest
-#     strategy:
-#       runOnce:
-#         deploy:
-#           steps:
+- stage: Deploy
+  displayName: Deploy to Dev
+  dependsOn: Build
+  jobs:
+  - deployment: Deploy
+    displayName: Deploy to AKS
+    environment: 'Production' 
+    pool:
+      vmImage: ubuntu-latest
+    strategy:
+      runOnce:
+        deploy:
+          steps:
 
-#             - task: DownloadPipelineArtifact@2
-#               inputs:
-#                 buildType: 'current'
-#                 artifactName: 'manifests'
-#                 targetPath: '$(Pipeline.Workspace)/manifests'
+            - task: DownloadPipelineArtifact@2
+              inputs:
+                buildType: 'current'
+                artifactName: 'manifests'
+                targetPath: '$(Pipeline.Workspace)/manifests'
 
-#             - task: KubernetesManifest@0
-#               inputs:
-#                 action: 'createSecret'
-#                 kubernetesServiceConnection: 'ClusterNttData'
-#                 namespace: 'nttdatadev'
-#                 secretType: 'dockerRegistry'
-#                 secretName: '$(acrsecret)'
-#                 dockerRegistryEndpoint: 'ARCNttData'
+            - task: KubernetesManifest@0
+              inputs:
+                action: 'createSecret'
+                kubernetesServiceConnection: 'ClusterNttData'
+                namespace: 'nttdatadev'
+                secretType: 'dockerRegistry'
+                secretName: '$(acrsecret)'
+                dockerRegistryEndpoint: 'ARCNttData'
 
-#             - task: KubernetesManifest@0
-#               inputs:
-#                 action: 'deploy'
-#                 kubernetesServiceConnection: 'ClusterNttData'
-#                 namespace: 'nttdatadev'
-#                 manifests: |
-#                   $(Pipeline.Workspace)/manifests/deployment.yml
-#                   $(Pipeline.Workspace)/manifests/service.yml
-#                 containers: '$(acrdevurl)/$(imageRepo):$(tag)'
-#                 imagePullSecrets: '$(acrsecret)'
+            - task: KubernetesManifest@0
+              inputs:
+                action: 'deploy'
+                kubernetesServiceConnection: 'ClusterNttData'
+                namespace: 'nttdatadev'
+                manifests: |
+                  $(Pipeline.Workspace)/manifests/deployment.yml
+                  $(Pipeline.Workspace)/manifests/service.yml
+                containers: '$(acrdevurl)/$(imageRepo):$(tag)'
+                imagePullSecrets: '$(acrsecret)'
