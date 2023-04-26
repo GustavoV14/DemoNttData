@@ -81,8 +81,8 @@ stages:
           containerRegistry: 'ARCNttData'
           repository: '$(imageRepo)'
           command: 'buildAndPush'
-          Dockerfile: '$(Build.SourcesDirectory)/Demo.Api/Dockerfile'
-          buildContext: '$(Build.SourcesDirectory)/Demo.Api/'
+          Dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+          buildContext: '$(Build.SourcesDirectory)/'
           tags: '$(tag)'
           
          
