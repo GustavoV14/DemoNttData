@@ -5,10 +5,10 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
-COPY ["Demo.Api/Demo.Api.csproj", "Demo.Api/"]
-RUN dotnet restore "Demo.Api/Demo.Api.csproj"
-COPY . .
-WORKDIR "/src/Demo.Api"
+COPY ["Demo.Api/Demo.Api.csproj", "."]
+RUN dotnet restore "Demo.Api.csproj"
+COPY /Demo.Api .
+WORKDIR "/src/."
 RUN dotnet build "Demo.Api.csproj" -c Release -o /app/build
 
 FROM build AS publish

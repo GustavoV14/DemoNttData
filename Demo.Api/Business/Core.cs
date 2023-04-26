@@ -1,15 +1,15 @@
-﻿using NTTData.Dto;
-using static NTTData.Dto.Response;
+﻿using Demo.Api.Dto;
+using static Demo.Api.Dto.Response;
 
-namespace NTTData.Business
+namespace Demo.Api.Business
 {
     public class Core
     {
         public Core() { }
-        public Response GetWelcome (Request rq)
+        public Response GetWelcome(Request rq)
         {
-            Response.Const data = new Response.Const();
-            return new Response { message = data.hello+rq.to+ data.wellcome }; 
+            Const data = new Const();
+            return new Response { message = data.hello + rq.to + data.wellcome };
         }
     }
 }

@@ -1,5 +1,5 @@
-using NTTData.Business;
-using NTTData.Dto;
+using Demo.Api.Business;
+using Demo.Api.Dto;
 
 namespace Demo.Test
 {

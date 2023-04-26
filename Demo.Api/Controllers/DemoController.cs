@@ -1,8 +1,8 @@
+using Demo.Api.Business;
+using Demo.Api.Dto;
 using Microsoft.AspNetCore.Mvc;
-using NTTData.Business;
-using NTTData.Dto;
 
-namespace NTTData.Controllers
+namespace Demo.Api.Controllers
 {
     [ApiController]
     [Route("DevOps")]
